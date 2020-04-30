@@ -1,162 +1,327 @@
 #!/usr/bin/python3
 # -*- coding: Utf-8 -*
 
+"""
+Program class, requests SQL.
+"""
+
 import mysql.connector
 from mysql.connector import errorcode
 
 
-
 class MySqlConnector():
-	"""
-	This class allows us to create request SQL and to connect on mysql. 
-	"""
+    """
+    This class allows us to connect on mysql first, and to create request SQL.
+    """
 
+    def __init__(self):
 
-	def __init__(self):
+        self.p_id = ''
+        self.c_id = ''
 
-		self.r_add_product = ''
-		self.r_add_category = ''
+        self.data_p = ''
+        self.data_c = ''
+        self.data_s = ''
+        self.data_a = ''
 
-		self.r_display_category = ''
-		self.r_display_product = ''
-		self.r_display_substitute_product = ''
-		self.r_display_substitued_product = ''
+        self.r_add_category = ''
+        self.r_add_product = ''
+        self.r_add_store = ''
+        self.r_add_association = ''
 
-		self.rows1 = ''
+        self.r_search_category = ''
+        self.r_search_product = ''
+        self.r_search_substitute_product = ''
+        self.r_search_substitued_product = ''
+        self.r_search_store = ''
+        self.r_search_product_stores = ''
 
-		try:
-			self.conn = mysql.connector.connect(host='localhost', user='user_p5', password='iutgea', database='p5') # connection to mysql.
+        self.r_save_substitute_product = ''
+        self.r_delete_substitued_product = ''
+        self.r_add_substitut_id = ''
 
-		except mysql.connector.Error as err:
+        self.rows1 = ''
+        self.rows2 = ''
+        self.rows3 = ''
+        self.rows4 = ''
+        self.rows5 = ''
+        self.rows6 = ''
 
-			if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-				print("Something is wrong with the user name or password")
+        self.cursor = ''
 
-			elif err.errno == errorcode.ER_BAD_DB_ERROR:
-				print('Database does not exist')
+        self.connection()
 
-			else:
-				print(err)
+    def connection(self):
+        """
+        This method allows us to connect to our database MySQL.
+        """
 
-		else:
-			self.cursor = self.conn.cursor(buffered=True)
+        try:
+            self.conn = mysql.connector.connect(host='localhost',
+                                                user='user_p5',
+                                                password='iutgea',
+                                                database='p5')
 
+        except mysql.connector.Error as err:
 
-	def request_add_product(self, data_product):
-		"""
-		This method allows to create a request SQL wich will insert the data product from OpenFoodFact into our database mysql.
-		"""
+            if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+                print("Something is wrong with the user name or password")
 
-		self.data_product = data_product
+            elif err.errno == errorcode.ER_BAD_DB_ERROR:
+                print('Database does not exist')
 
-		self.r_add_product = ("""INSERT INTO product (name, nutriscore, nutriscore_value, url, stores, category_name, category_id) 
-								 VALUES (%s, %s, %s, %s, %s, %s, %s) """)
-		self.cursor.execute(self.r_add_product, self.data_product)
-		self.conn.commit()
+            else:
+                print(err)
 
+        else:
+            self.cursor = self.conn.cursor(buffered=True)
 
-	def request_add_category(self, data_category):
-		"""
-		This method allows to create a request SQL wich will insert the data category into our database mysql.
-		"""
-		self.data_category = data_category
+    def request_add_product(self, data_p):
+        """
+        This method allows us to create a request SQL,
+        wich will insert the data product from OpenFoodFact into our table 'Product'.
+        """
 
-		self.r_add_category = (""" INSERT INTO category (name) 
-								   VALUES (%s) """)
-		self.cursor.execute(self.r_add_category, self.data_category)
-		self.conn.commit()
+        self.data_p = data_p
 
+        self.r_add_product = (""" INSERT INTO Product (name,
+                                                       nutriscore,
+                                                       nutriscore_value,
+                                                       url,
+                                                       category_name,
+                                                       category_id)
+                                  VALUES (%s,
+                                          %s,
+                                          %s,
+                                          %s,
+                                          %s,
+                                          %s)
+                              """)
 
-	def request_search_category(self):
-		"""
-		This method allows to create a request SQL wich will search data category in our database "category".
-		"""
+        self.cursor.execute(self.r_add_product, self.data_p)
+        self.conn.commit()
 
-		self.r_search_category = (""" SELECT id, name 
-									  FROM category """)
-		self.cursor.execute(self.r_search_category)
-		self.rows1 = self.cursor.fetchall()
-		self.conn.commit()
-		for row in self.rows1:
-			print('{0} : {1}'.format(row[0], row[1]))
+    def request_add_category(self, data_c):
+        """
+        This method allows to create a request SQL,
+        wich will insert the data category into our table 'Category'.
+        """
 
+        self.data_c = data_c
 
-	def request_search_product(self, category_id):
-		"""
-		This method allows to create a request SQL wich will search data product in our database "product".
-		"""
+        self.r_add_category = (""" INSERT INTO Category (name)
+                                   VALUES (%s) 
+                               """)
 
-		self.category_id = category_id
+        self.cursor.execute(self.r_add_category, self.data_c)
+        self.conn.commit()
 
-		self.r_search_product = (""" SELECT id, name, nutriscore 
-									 FROM product 
-									 WHERE category_id LIKE %s """)
-		self.cursor.execute(self.r_search_product, (self.category_id,))
-		self.rows2 = self.cursor.fetchall()
-		self.conn.commit()
-		for row in self.rows2:
-			print('{0} : {1} : {2}'.format(row[0], row[2], row[1]))
+    def request_add_store(self, data_s):
+        """
+        This method allows to create a request SQL,
+        wich will insert the data category into our table 'Category'.
+        """
 
+        self.data_s = data_s
 
-	def request_search_substitute_product(self, category_id):
-		"""
-		This method allows to create a request SQL wich will search substitute product in our database "product".
-		For that, we collect the best of 5 nutriscore in the same category to find a substitute product.
-		"""
+        self.r_add_store = (""" INSERT INTO Store (name)
+                                VALUES (%s) 
+                            """)
 
-		self.category_id = category_id
+        self.cursor.execute(self.r_add_store, self.data_s)
+        self.conn.commit()
 
-		self.r_search_substitute_product = (""" SELECT id, name, nutriscore, url, stores 
-												FROM product 
-												WHERE category_id LIKE %s 
-												ORDER BY nutriscore """) 
-		self.cursor.execute(self.r_search_substitute_product, (self.category_id,)) # A FAIRE
-		self.rows3 = self.cursor.fetchmany(5)
-		self.conn.commit()
-		for row in self.rows3:
-			print('{0} : {1} : {2} : {3}'.format(row[0], row[2], row[1], row[3]))
+    def request_add_association(self, data_a):
+        """
+        This method allows to create a request SQL,
+        wich will insert the data association into our table 'Association'.
+        """
 
+        self.data_a = data_a
 
-	def request_save_substitute_product(self, product_id):
-		"""
-		This method allows us to create a request SQL to insert on our database "substitued_product" the data from the substitute product selected by the user.
-		"""
-		
-		self.product_id = product_id
+        self.r_add_association = (""" INSERT INTO Association (product_id,
+                                                               store_id) 
+                                      VALUES (%s,
+                                              %s)
+                                  """)
 
-		self.r_save_product = (""" INSERT INTO substitued_product(name, nutriscore, nutriscore_value, url, stores, category_name, category_id) 
-								   SELECT name, nutriscore, nutriscore_value, url, stores, category_name, category_id
-								   FROM product
-								   WHERE id LIKE %s""")
+        self.cursor.execute(self.r_add_association, self.data_a)
+        self.conn.commit()
 
-		self.cursor.execute(self.r_save_product, (self.product_id,)) 
-		self.conn.commit()
+    def request_search_category(self):
+        """
+        This method allows us to create a request SQL,
+        wich will search data category in our table 'Category'.
+        """
 
+        self.r_search_category = (""" SELECT id,
+                                             name 
+                                      FROM Category
+                                  """)
 
-	def request_search_substitued_product(self):
-		"""
-		This method allows us to create a request SQL wich will select the data from the substitued_product database (user database).
-		"""
+        self.cursor.execute(self.r_search_category)
+        self.rows1 = self.cursor.fetchall()
+        self.conn.commit()
 
-		self.r_search_substitued_product = (""" SELECT DISTINCT id, name, nutriscore, category_name, url, stores
-												FROM substitued_product """)
-		self.cursor.execute(self.r_search_substitued_product)
-		self.conn.commit()
-		self.rows4 = self.cursor.fetchall()
-		for row in self.rows4:
-			print('{0} : {1} : {2} : {3} : {4} : {5}'.format(row[0], row[1], row[2], row[3], row[4], row[5]))
+    def request_search_store(self):
+        """
+        This method allows us to create a request SQL,
+        wich will search data store in our table 'Store'.
+        """
 
+        self.r_search_store = (""" SELECT id,
+                                          name 
+                                   FROM Store
+                               """)
 
-	def request_delete_substitued_product(self, product_id):
-		"""
-		This method allows us to create a request SQL wich will delete a substitued product, from the database, definitely.
-		"""
+        self.cursor.execute(self.r_search_store)
+        self.rows2 = self.cursor.fetchall()
+        self.conn.commit()
 
-		self.product_id = product_id
+    def request_search_product(self, c_id):
+        """
+        This method allows us to create a request SQL,
+        wich will search data product in our table 'Product'.
+        """
 
-		self.r_delete_substitued_product = (""" DELETE FROM substitued_product
-												WHERE id LIKE %s """)
-		self.cursor.execute(self.r_delete_substitued_product, (self.product_id,))
-		self.conn.commit()
+        self.c_id = c_id
 
+        self.r_search_product = (""" SELECT id,
+                                            name,
+                                            nutriscore 
+                                     FROM Product 
+                                     WHERE category_id LIKE %s 
+                                     ORDER BY RAND()
+                                     LIMIT 15
+                                 """)
 
+        self.cursor.execute(self.r_search_product, (self.c_id,))
+        self.rows3 = self.cursor.fetchmany(15)
+        self.conn.commit()
+
+    def request_search_substitute_product(self, c_id):
+        """
+        This method allows us to create a request SQL,
+        wich will search substitute product in our table 'Product'.
+        For that, we collect the best of 5 nutriscore in the same category.
+        """
+
+        self.c_id = c_id
+
+        self.r_search_substitute_product = (""" SELECT p.id,
+                                                       p.name,
+                                                       p.nutriscore,
+                                                       p.url,
+                                                       GROUP_CONCAT(s.name SEPARATOR ', ') as concat_name
+                                                FROM product as p
+                                                JOIN association as a
+                                                ON p.id = a.product_id
+                                                JOIN store as s
+                                                ON s.id = a.store_id
+                                                WHERE p.category_id LIKE %s
+                                                GROUP BY p.id
+                                                ORDER BY p.nutriscore
+                                            """)
+
+        self.cursor.execute(self.r_search_substitute_product, (self.c_id,))
+        self.rows4 = self.cursor.fetchmany(5)
+        self.conn.commit()
+
+    def request_search_substitued_product(self):
+        """
+        This method allows us to create a request SQL,
+        wich will search data from the 'SubstituedProduct' table (user database).
+        """
+
+        self.r_search_substitued_product = (""" SELECT DISTINCT id,
+                                                                name,
+                                                                nutriscore,
+                                                                category_name,
+                                                                url,
+                                                                store
+                                                FROM SubstituedProduct
+                                            """)
+
+        self.cursor.execute(self.r_search_substitued_product)
+        self.conn.commit()
+        self.rows5 = self.cursor.fetchall()
+
+    def request_search_product_stores(self):
+        """
+        This method allows us to create a request SQL,
+        wich will search data store in our table 'Store'.
+        """
+
+        self.r_search_product_stores = (""" SELECT MAX(id)
+                                            FROM Product
+                                        """)
+
+        self.cursor.execute(self.r_search_product_stores)
+        self.conn.commit()
+        self.rows6 = self.cursor.fetchall()
+
+    def request_save_substitute_product(self, p_id):
+        """
+        This method allows us to create a request SQL,
+        to insert on our table 'SubstituedProduct',
+        data from the substitute product selected by the user.
+        """
+
+        self.p_id = p_id
+
+        self.r_save_substitute_product = (""" INSERT INTO SubstituedProduct(name,
+                                                                            nutriscore,
+                                                                            nutriscore_value,
+                                                                            url,
+                                                                            category_name,
+                                                                            category_id,
+                                                                            store) 
+                                              SELECT p.name,
+                                                     p.nutriscore,
+                                                     p.nutriscore_value,
+                                                     p.url,
+                                                     p.category_name,
+                                                     p.category_id,
+                                                     GROUP_CONCAT(s.name SEPARATOR ', ') as concat_name
+                                              FROM Product as p
+                                              JOIN association as a
+                                              ON p.id = a.product_id
+                                              JOIN store as s
+                                              ON s.id = a.store_id
+                                              WHERE p.id LIKE %s
+                                              GROUP BY p.id
+                                          """)
+
+        self.cursor.execute(self.r_save_substitute_product, (self.p_id,))
+        self.conn.commit()
+
+    def request_add_substitut_id(self, p_id):
+        """
+        This method allows us to add substitut_id in 'Product' table,
+        from 'SubstituedProduct' table when we save an substitute product.
+        """
+
+        self.p_id = p_id
+
+        self.r_add_substitut_id = (""" UPDATE Product
+                                       SET substitut_id = (SELECT MAX(id) 
+                                                           FROM SubstituedProduct)
+                                       WHERE id LIKE %s
+                                   """)
+        self.cursor.execute(self.r_add_substitut_id, (self.p_id,))
+        self.conn.commit()
+
+    def request_delete_substitued_product(self, p_id):
+        """
+        This method allows us to create a request SQL,
+        wich will delete a substitued product, from the user database, definitely.
+        """
+
+        self.p_id = p_id
+
+        self.r_delete_substitued_product = (""" DELETE FROM SubstituedProduct
+                                                WHERE id LIKE %s
+                                            """)
+
+        self.cursor.execute(self.r_delete_substitued_product, (self.p_id,))
+        self.conn.commit()
