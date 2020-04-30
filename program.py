@@ -120,7 +120,6 @@ class Program():
 
                 self.store.add_store(store)
 
-
             print('Chargement des magasins finalisé.')
 
         else:
@@ -163,7 +162,7 @@ class Program():
                         p_cat_name = cat_name
                         p_cat_id = cat_id
 
-                        for n_id, n_text in CONV.items(): # find CONV in constant.py file.
+                        for n_id, n_text in CONV.items():
                             if p_nutri == n_text:
                                 p_nutri_value = n_id
 

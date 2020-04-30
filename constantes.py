@@ -20,16 +20,16 @@ LIST_CATEGORY = [['1', 'Biscuits'],
 
 LIST_NUTRISCORE = ['a', 'b', 'c', 'd', 'e']
 
-CONV = {1 : 'a',
-        2 : 'b',
-        3 : 'c',
-        4 : 'd',
-        5 : 'e'}
+CONV = {1: 'a',
+        2: 'b',
+        3: 'c',
+        4: 'd',
+        5: 'e'}
 
 # URL OpenFoodFact:
 
 URL_BEGIN = 'https://fr.openfoodfacts.org/cgi/search.pl?action=process&tagtype_0=categories&tag_contains_0=contains&tag_0='
-URL_END = '&sort_by=unique_scans_n&page_size=200&axis_x=energy&axis_y=products_n&action=display&json=1' # page_size = number of product per url...
+URL_END = '&sort_by=unique_scans_n&page_size=200&axis_x=energy&axis_y=products_n&action=display&json=1'  # page_size = number of product per url...
 
 
 # Guideline in user interface:

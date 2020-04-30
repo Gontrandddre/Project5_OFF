@@ -90,7 +90,7 @@ class Database():
             url text NOT NULL,
             store text NOT NULL,
             category_id int(10) unsigned NULL,
-            category_name varchar(200) NOT NULL, 
+            category_name varchar(200) NOT NULL,
             CONSTRAINT SubstituedProduct_pk PRIMARY KEY (id)
         )
         ENGINE=InnoDB DEFAULT CHARSET utf8mb4;

@@ -110,7 +110,7 @@ class MySqlConnector():
         self.data_c = data_c
 
         self.r_add_category = (""" INSERT INTO Category (name)
-                                   VALUES (%s) 
+                                   VALUES (%s)
                                """)
 
         self.cursor.execute(self.r_add_category, self.data_c)
@@ -125,7 +125,7 @@ class MySqlConnector():
         self.data_s = data_s
 
         self.r_add_store = (""" INSERT INTO Store (name)
-                                VALUES (%s) 
+                                VALUES (%s)
                             """)
 
         self.cursor.execute(self.r_add_store, self.data_s)
@@ -140,7 +140,7 @@ class MySqlConnector():
         self.data_a = data_a
 
         self.r_add_association = (""" INSERT INTO Association (product_id,
-                                                               store_id) 
+                                                               store_id)
                                       VALUES (%s,
                                               %s)
                                   """)
@@ -155,7 +155,7 @@ class MySqlConnector():
         """
 
         self.r_search_category = (""" SELECT id,
-                                             name 
+                                             name
                                       FROM Category
                                   """)
 
@@ -170,7 +170,7 @@ class MySqlConnector():
         """
 
         self.r_search_store = (""" SELECT id,
-                                          name 
+                                          name
                                    FROM Store
                                """)
 
@@ -188,9 +188,9 @@ class MySqlConnector():
 
         self.r_search_product = (""" SELECT id,
                                             name,
-                                            nutriscore 
-                                     FROM Product 
-                                     WHERE category_id LIKE %s 
+                                            nutriscore
+                                     FROM Product
+                                     WHERE category_id LIKE %s
                                      ORDER BY RAND()
                                      LIMIT 15
                                  """)
@@ -275,7 +275,7 @@ class MySqlConnector():
                                                                             url,
                                                                             category_name,
                                                                             category_id,
-                                                                            store) 
+                                                                            store)
                                               SELECT p.name,
                                                      p.nutriscore,
                                                      p.nutriscore_value,
@@ -304,7 +304,7 @@ class MySqlConnector():
         self.p_id = p_id
 
         self.r_add_substitut_id = (""" UPDATE Product
-                                       SET substitut_id = (SELECT MAX(id) 
+                                       SET substitut_id = (SELECT MAX(id)
                                                            FROM SubstituedProduct)
                                        WHERE id LIKE %s
                                    """)
