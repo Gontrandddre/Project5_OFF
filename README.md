@@ -54,9 +54,7 @@ Environnement:
 	4. Structure base de données 
 
 Notre programme s'appuie sur le système de gestion de base de données MySql.
-Ci-dessous le modèle physique de données:
-
-![40% center](doc/P5_MPD.jpg)
+Retrouver le modèle physique de données dans le dossier "doc" du répertoire.
 
 	4. Les algorithmes:
 
