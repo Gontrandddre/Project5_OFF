@@ -15,7 +15,8 @@ Date de réalisation: mars 2020 - mai 2019 Lien Github: https://github.com/Gontr
 Auteur: Gontrand D., étudiant Openclassrooms.
 
 
-1. Comment utiliser ce programme:
+1. COMMENT UTILISER CE PROGRAMME:
+
 
 Avant toute utilisation de ce programme, il est nécessaire au préalable de:
 -créer en local un compte utilisateur MySQL;
@@ -25,7 +26,7 @@ Lancement du programme:
 L'utilisateur devra se rendre sur le terminal de sa machine et lancer le fichier principal "program.py".
 
 
-2. Environnement
+2. ENVIRONNEMENT
 
 Ci-dessous, l'envrionnement de travail dans lequel a été réalisé le projet:
 
@@ -40,7 +41,7 @@ Ci-dessous, l'envrionnement de travail dans lequel a été réalisé le projet:
    - Solution d'environnement virtuel: VirtualEnv.
 
 
-3. Structure projet:
+3. STRUCTURE PROJET:
 
 A. FICHIERS INSPIRÉS DU MODÉLE MVC (MODÈLE VUE CONTRÔLEUR):
    
@@ -59,13 +60,13 @@ C. FICHIERS COMPLÉMENTAIRES:
    - ".gitignore" (dossiers/fichiers à ignorer pour GitHub).
 
 
-4. Structure base de données 
+4. STRUCTURE BASE DE DONNÉES 
 
 Notre programme s'appuie sur le système de gestion de base de données MySql.
 Retrouver le modèle physique de données dans le dossier "doc" du répertoire.
 
 
-5. Les algorithmes:
+5. LES ALGORITHMES:
 
 A. CRÉATION DE LA STRUCTURE DE LA BASE DE DONNÉES:
 
@@ -79,15 +80,17 @@ Ce script permet de créer la structure de la base de données de notre programm
 
 B. INSERTION DES DONNÉES DANS LA BASE DE DONNÉES: 
 
-Source: Fichier "program.py"
+Source: Fichier "program.py", class "Program", méthode "generate_data"
 
-Les méthodes "generate..." de la classe "Program" permettent d'insérer les données suivantes dans les différentes tables de la base de données:
+Ce script permet d'insérer les données suivantes dans les différentes tables de la base de données:
    - Category: 10 catégories pré-sélectionnées;
    - Product: 1000 produits par catégorie;
    - Store: Récupération de tous les magasins renseignés par produit;
    - Association: Association d'un produit avec un ou plusieurs magasins. Un produit peut avoir un ou plusieurs magasins, un magasin peut avoir un ou plusieurs produits.
 
 C. GESTION DE L'INTERFACE UTILISATEUR:
+
+Source: Fichier "Program.py", classe "Program", méthode "main".
 
 Au commencement le programme propose deux fonctionnalités:
 
@@ -110,11 +113,13 @@ A chaque fin de fonctionnalité, l'utilisateur peut quitter le programme ne appu
 
 D. GESTION DES ENTRÉES UTILISATEUR:
 
+Source: Fichier "Program.py", classe "Program", méthode "get_input".
+
 Le programme vérifie si l'entrée correspond bien à une des propositions affichées.
 En cas d'entrée non valide, le programme proposera à l'utilisateur de saisir à nouveau une référence.
 
 
-6. Axes de développement:
+6. AXES DE DÉVELOPPEMENT:
 
 - Interface graphisme.
 - Ajouter sous catégories pour améliorer la recherche d'un produit de substitution.
