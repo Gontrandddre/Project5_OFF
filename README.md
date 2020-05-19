@@ -20,7 +20,7 @@ Auteur: Gontrand D., étudiant Openclassrooms.
 
 Avant toute utilisation de ce programme, il est nécessaire au préalable de:
 -créer en local un compte utilisateur MySQL;
--remplacer les informations de connexion au sein du fichier 'requests_mysql.py' dans la méthode 'connection' de la classe 'MySQLconector'.
+-remplacer les informations de connexion au sein du fichier 'requests_mysql.py' dans la méthode 'connection' de la classe 'MySQLconnector'.
 
 Lancement du programme:
 L'utilisateur devra se rendre sur le terminal de sa machine et lancer le fichier principal "program.py".
