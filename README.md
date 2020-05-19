@@ -24,6 +24,7 @@ Avant toute utilisation de ce programme, il est nécessaire au préalable de:
 Lancement du programme:
 L'utilisateur devra se rendre sur le terminal de sa machine et lancer le fichier principal "program.py".
 
+
 2. Environnement
 
 Ci-dessous, l'envrionnement de travail dans lequel a été réalisé le projet:
@@ -38,32 +39,35 @@ Ci-dessous, l'envrionnement de travail dans lequel a été réalisé le projet:
    - Outil de communication: GitHub;
    - Solution d'environnement virtuel: VirtualEnv.
 
+
 3. Structure projet:
 
-		A. fichiers inspirés du modéle MVC (Modèle Vue Contrôleur):
+A. FICHIERS INSPIRÉS DU MODÉLE MVC (MODÈLE VUE CONTRÔLEUR):
    
    - Vue: "interface_program.py";
    - Modèle: "requests_mysql.py" / "create_database.py";  
    - Contrôleur: "program.py".
 
-		B. fichiers supports:
+B. FICHIERS SUPPORTS:
    
    - Constantes du programme: "constantes.py";
    - Script de la structure de la base de données: "scripts_structure_database.sql".
 
-		C. fichiers complémentaires: 
+C. FICHIERS COMPLÉMENTAIRES: 
    
    - "requirements.txt" (bibliothèques utilisées);
    - ".gitignore" (dossiers/fichiers à ignorer pour GitHub).
+
 
 4. Structure base de données 
 
 Notre programme s'appuie sur le système de gestion de base de données MySql.
 Retrouver le modèle physique de données dans le dossier "doc" du répertoire.
 
+
 5. Les algorithmes:
 
-		A. Création de la structure de la base de données:
+A. CRÉATION DE LA STRUCTURE DE LA BASE DE DONNÉES:
 
 Source: Fichier "create_database.py" + "script_structure_database.sql".
 
@@ -73,7 +77,7 @@ Ce script permet de créer la structure de la base de données de notre programm
    - Store;
    - Association.
 
-		B. Insertion des données dans la base de données: 
+B. INSERTION DES DONNÉES DANS LA BASE DE DONNÉES: 
 
 Source: Fichier "program.py"
 
@@ -83,7 +87,7 @@ Les méthodes "generate..." de la classe "Program" permettent d'insérer les don
    - Store: Récupération de tous les magasins renseignés par produit;
    - Association: Association d'un produit avec un ou plusieurs magasins. Un produit peut avoir un ou plusieurs magasins, un magasin peut avoir un ou plusieurs produits.
 
-		C. Gestion de l'interface utilisateur:
+C. GESTION DE L'INTERFACE UTILISATEUR:
 
 Au commencement le programme propose deux fonctionnalités:
 
@@ -104,10 +108,11 @@ A chaque étape du programme, l'utilisateur aura un un guide d'utilisation.
 L'utilisateur peut revenir au menu principal en appuyant sur 'h', à tout moment.
 A chaque fin de fonctionnalité, l'utilisateur peut quitter le programme ne appuyant sur 'q'.
 
-		D. Gestion des entrées utilisateur:
+D. GESTION DES ENTRÉES UTILISATEUR:
 
 Le programme vérifie si l'entrée correspond bien à une des propositions affichées.
 En cas d'entrée non valide, le programme proposera à l'utilisateur de saisir à nouveau une référence.
+
 
 6. Axes de développement:
 
