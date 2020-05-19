@@ -15,7 +15,7 @@ Date de réalisation: mars 2020 - mai 2019 Lien Github: https://github.com/Gontr
 Auteur: Gontrand D., étudiant Openclassrooms.
 
 
-	1. Comment utiliser ce programme:
+1. Comment utiliser ce programme:
 
 Avant toute utilisation de ce programme, il est nécessaire au préalable de:
 -créer en local un compte utilisateur MySQL
@@ -24,7 +24,7 @@ Avant toute utilisation de ce programme, il est nécessaire au préalable de:
 Lancement du programme:
 L'utilisateur devra se rendre sur le terminal de sa machine et lancer le fichier principal "program.py".
 
-	2. Environnement
+2. Environnement
 
 Environnement:
 
@@ -38,72 +38,74 @@ Environnement:
 -Outil de communication: GitHub;
 -Solution d'environnement virtuel: VirtualEnv.
 
-	3. Structure projet:
+3. Structure projet:
 
 -fichiers inspirés du modéle MVC (Modèle Vue Contrôleur):
 	- Vue: "interface_program.py";
 	- Modèle: "requests_mysql.py" / "create_database.py";
-	- Contrôleur: "program.py";
+	- Contrôleur: "program.py".
+
 -fichiers supports:
-	- Constantes du programme: "constantes.py"
-	- Script de la structure de la base de données: "scripts_structure_database.sql"
+	- Constantes du programme: "constantes.py";
+	- Script de la structure de la base de données: "scripts_structure_database.sql".
+
 -fichiers complémentaires: 
 	- "requirements.txt" (bibliothèques utilisées);
 	- ".gitignore" (dossiers/fichiers à ignorer pour GitHub).
 
-	4. Structure base de données 
+4. Structure base de données 
 
 Notre programme s'appuie sur le système de gestion de base de données MySql.
 Retrouver le modèle physique de données dans le dossier "doc" du répertoire.
 
-	4. Les algorithmes:
+5. Les algorithmes:
 
-- Création de la structure de la base de données:
+		Création de la structure de la base de données:
 
 Ce script permet de créer la structure de la base de données de notre programme. Nous aurons quatre tables:
 	- Category;
 	- Product;
 	- Store;
-	- Association;
+	- Association.
 
-- Insertion des données dans la base de données: 
+		Insertion des données dans la base de données: 
 
-	-Category: 10 catégories pré-sélectionnées.
-	-Product: 1000 produits par catégorie.
-	-Store: Récupération de tous les magasins renseignés par produit.
-	-Association: Association d'un produit avec un ou plusieurs magasins. Un produit peut avoir un ou plusieurs magasins, un magasin peut avoir un ou plusieurs produits.
+   - Category: 10 catégories pré-sélectionnées;
+   - Product: 1000 produits par catégorie;
+   - Store: Récupération de tous les magasins renseignés par produit;
+   - Association: Association d'un produit avec un ou plusieurs magasins. Un produit peut avoir un ou plusieurs magasins, un magasin peut avoir un ou plusieurs produits.
 
 
--Gestion de l'interface utilisateur:
+		Gestion de l'interface utilisateur:
 
 A chaque étape du programme, l'utilisateur aura un un guide d'utilisation. En cas d'entrée non valide, le programme proposera à l'utilisateur
 A tout moment l'utilisateur peut revenir au menu principal en appuyant sur 'h'
 A chaque fin de fonctionnalité, l'utilisateur peut quitter le programme ne appuyant sur 'q'.
 
 
-Au commencement le programme propose deux fonctinnalités:
+Au commencement le programme propose deux fonctionnalités:
 1. Rechercher un produit de substitution.
 2. Retrouver ses produits substitués
 
 A tout moment l'utilisateur peut revenir au menu principal en appuyant sur 'h'
 A chaque fin de fonctionnalité, l'utilisateur peut quitter le programme ne appuyant sur 'q'.
 
->>>Fonctionnalité 1:
-//Affichage des catégories
-- Sélectionne une catégorie // Affichage d'un panel de produits.
-- Sélectionne un produit // Affichage d'un panel de produits de substitutions.
-- Sélectionne un produit de subsitution // Sauvegarde du produit sélectionné.
+Fonctionnalité 1:
+Affichage des catégories
+- Sélectionne une catégorie >>> Affichage d'un panel de produits.
+- Sélectionne un produit >>> Affichage d'un panel de produits de substitutions.
+- Sélectionne un produit de subsitution >>> Sauvegarde du produit sélectionné.
 
->>>Fonctionnalité 2:
-//Affichage des produits sauvegardés.
-- Sélectionne un produit // Suppression du produit sélectionné.
+Fonctionnalité 2:
+Affichage des produits sauvegardés.
+- Sélectionne un produit >>> Suppression du produit sélectionné.
 
--Gestion des entrées utilisateur:
+		Gestion des entrées utilisateur:
 
 Le programme vérifie si l'entrée correspond bien à une des propositions affichées.
 En cas d'entrée non valide, le programme proposera à l'utilisateur de saisir à nouveau une référence.
 
-	5. Axes de développement:
+6. Axes de développement:
 
 - Interface graphisme.
 - Ajouter sous catégories pour améliorer la recherche d'un produit de substitution.
