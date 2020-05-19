@@ -10,315 +10,345 @@ Files : program.py, classes_program.py, classes_mysql.py, constantes.py, databas
 import sys
 import requests
 
-from database import (Database)
+from create_database import (Table)
 from constantes import (
-        LIST_CATEGORY, CONV, URL_BEGIN, URL_END, PROPOSALS,
-        GUIDELINE_PROPOSALS, GUIDELINE_CATEGORY, GUIDELINE_PRODUCT,
-        GUIDELINE_SUBSTITUTE_PRODUCT, GUIDELINE_SUBSTITUED_PRODUCT,
-        GUIDELINE_END_PROCESS_PROPOSAL1, GUIDELINE_END_PROCESS_PROPOSAL2,
-        WRONG_ID, WRONG_INPUT, END_PROCESS
+    CATEGORY, CONV, URL_BEGIN, P_SIZE,
+    STEP1, STEP1_BIS,
+    STEP2, STEP2_BIS,
+    STEP3, STEP3_BIS,
+    STEP4, STEP4_BIS,
+    STEP5, STEP5_BIS,
+    STEP6, STEP6_BIS,
+    STEP7, STEP7_BIS,
+    WRONG_ID, END_PROCESS,
+    REQUEST_ADD_PRODUCT, REQUEST_ADD_CATEGORY, REQUEST_ADD_ASSOCIATION, REQUEST_ADD_STORE,
+    REQUEST_SEARCH_CATEGORY, REQUEST_SEARCH_STORE, REQUEST_SEARCH_PRODUCT,
+    REQUEST_SEARCH_SUBSTITUTE_PRODUCT, REQUEST_SEARCH_SUBSTITUED_PRODUCT,
+    REQUEST_SEARCH_PRODUCT_STORES, REQUEST_UPDATE_SUBSTITUT_ID,
+    REQUEST_DELETE_SUBSTITUT_ID, REQUEST_SEARCH_DATA
 )
-from classes_program import (Product, Association, Category, Store, Interface)
-from classes_mysql import (MySqlConnector)
+from interface_program import (Interface)
+from requests_mysql import (MySqlConnector)
+
+
+class Data():
+    """
+    This class allows us to work with sql request result in order to insert product data,
+    in a table sql called "product" in mysql with condition.
+    """
+
+    def __init__(self, **attributes):
+
+        self.mysql = MySqlConnector()
+
+        for attr_name, attr_value in attributes.items():
+            setattr(self, attr_name, attr_value)
+
+    def add_data(self, request, **attributes):
+        """
+        This method allows us to execute a sql request in order to insert product data,
+        in a table sql called "product" in mysql.
+        """
+
+        liste = []
+
+        for attr_name, attr_value in attributes.items():
+            if attr_name != 'mysql':
+                attributes[attr_name] = attr_value
+                liste.append(attributes[attr_name])
+
+        self.mysql.request_add_data(request, tuple(liste))
+
+    def condition_load_data(self, request):
+        """
+        This method allows us to determinate if the program have to load products from OFF.
+        """
+        return self.mysql.request_searchall_data(request)
+
+    def product_id(self, request):
+        """
+        This method allows us to find all id in product table.
+        """
+
+        self.mysql.request_searchall_data(request)
+        for row in self.mysql.rows:
+            return row[0]
 
 
 class Program():
     """
     This class allows us to generate data from OpenFoodFact in our database "category" & "product".
     Then, we create an interface for the user, he can search a substitute product to save it,
-    or find his saved substitued product from his database.
+    or find his saved substitued product.
     """
 
     def __init__(self):
 
-        self.table = Database()
-        self.table.table()
+        self.page_size = P_SIZE
 
-        self.category = Category()
-        self.product = Product()
-        self.store = Store()
-        self.association = Association()
+        self.product = ''
+        self.category = ''
+        self.store = ''
+        self.association = ''
 
-        self.display_proposals = Interface(GUIDELINE_PROPOSALS)
-        self.display_category = Interface(GUIDELINE_CATEGORY)
-        self.display_product = Interface(GUIDELINE_PRODUCT)
-        self.display_substitute_product = Interface(GUIDELINE_SUBSTITUTE_PRODUCT)
-        self.save_substitute_product = Interface(guideline='')
-        self.add_substitut_id = Interface(guideline='')
-        self.end_process_proposal1 = Interface(GUIDELINE_END_PROCESS_PROPOSAL1)
-        self.end_process_proposal2 = Interface(GUIDELINE_END_PROCESS_PROPOSAL2)
+        self.table = Table()
+        self.table.generate_structure_database("script_structure_database.sql")
 
-        self.display_substitued_product = Interface(GUIDELINE_SUBSTITUED_PRODUCT)
-        self.delete_substitued_product = Interface(guideline='')
+        self.mysql = MySqlConnector()
+        self.mysql.connection()
 
-        self.disconnect_mysql = MySqlConnector()
-        self.disconnect_mysql.connection()
+        self.display_proposals = Interface()
+        self.display_c = Interface()
+        self.display_p = Interface()
+        self.display_sub_p = Interface()
+        self.display_save_p = Interface()
 
-    def generate_data_category(self):
+        self.display_saved_p = Interface()
+        self.display_delete_p = Interface()
+
+    def generate_data(self):
         """
-        This method allows to insert the categories into our table sql 'Category'.
-        We select 10 categories from OpenFoodFact.
+        This method allows us to generate data program into mysql database.
         """
 
-        self.category.condition_load_category()
+        self.product = Data(**{'p_name':'',
+                               'p_nutri':'',
+                               'p_nutri_value':'',
+                               'p_url':'',
+                               'p_cat_name':'',
+                               'p_cat_id':''})
 
-        if self.category.result_table == []:
+        self.category = Data(**{'c_name':''})
 
-            self.table.foreign_key()
+        self.store = Data(**{'s_name':''})
 
-            c_name = ''
+        self.association = Data(**{'p_id':'',
+                                   's_id':''})
 
-            print('Chargement des catégories en-cours...')
-
-            for cat_id, cat_name in LIST_CATEGORY:
-
-                c_name = cat_name
-
-                self.category.add_category(c_name)
-
-            print('Chargement des catégories finalisé.')
-
-        else:
-            print('Les catégories ont déjà été téléchargé.')
-
-    def generate_data_store(self):
-        """
-        This method allows to insert the stores into our table sql 'Store'.
-        """
-
-        liste_stores_brut = []
-        liste_stores = []
-
-        self.store.condition_load_store()
-
-        if self.store.result_table == []:
-
-            s_name = ''
-
-            print('Chargement des magasins en-cours...')
-
-            for cat_id, cat_name in LIST_CATEGORY:
-
-                url = "{}{}{}".format(URL_BEGIN, cat_name, URL_END)
-
-                response = requests.get(url)
-                response_json = response.json()
-
-                for product in response_json["products"]:
-
-                    try:
-                        s_name = product["stores"]
-
-                        stores_product = s_name.split(",")
-                        liste_stores_brut.extend(stores_product)
-                        liste_stores = list(set(liste_stores_brut))
-
-                    except KeyError:
-                        pass
-
-            for store in liste_stores:
-
-                self.store.add_store(store)
-
-            print('Chargement des magasins finalisé.')
-
-        else:
-            print('Les magasins ont déjà été téléchargé.')
-
-    def generate_data_product(self):
-        """
-        This method allows to insert the categories into our table sql 'Category'.
-        We select 1000 products per category from OpenFoodFact.
-        """
-
-        self.product.condition_load_product()
-
-        if self.product.result_table == []:
-
-            p_name = ''
-            p_nutri = ''
-            p_nutri_value = ''
-            p_url = ''
-            p_stores = ''
-            p_cat_name = ''
-            p_cat_id = ''
+        if self.product.condition_load_data(REQUEST_SEARCH_DATA) == []:
 
             print('Chargement des données d\'OpenFoodFact en-cours...')
-
-            for cat_id, cat_name in LIST_CATEGORY:
-
-                url = "{}{}{}".format(URL_BEGIN, cat_name, URL_END)
-
-                response = requests.get(url)
-                response_json = response.json()
-
-                for product in response_json["products"]:
-
-                    try:
-                        p_name = product["product_name_fr"]
-                        p_nutri = product["nutriscore_grade"]
-                        p_url = product["url"]
-                        p_stores = product["stores"]
-                        p_cat_name = cat_name
-                        p_cat_id = cat_id
-
-                        for n_id, n_text in CONV.items():
-                            if p_nutri == n_text:
-                                p_nutri_value = n_id
-
-                        self.product.add_product(p_name, p_nutri, p_nutri_value, p_url, p_cat_name, p_cat_id)
-                        print(p_name, p_nutri, p_nutri_value, p_url, p_cat_name, p_cat_id)
-
-                    except KeyError:
-                        pass
-
-                    except ValueError:
-                        pass
-
-                    try:
-                        liste_product_stores = p_stores.split(",")
-                        p_id = self.product.product_id()
-
-                        self.store.condition_load_store()
-                        for row in self.store.result_table:
-
-                            for store in liste_product_stores:
-                                if row[1] == store:
-                                    self.association.add_association(p_id, row[0])
-
-                    except KeyError:
-                        pass
-
+            self.generate_category()
+            self.generate_store()
+            self.generate_product()
             print('Chargement des données d\'OpenFoodFact finalisé.')
 
         else:
             print('Les données d\'OpenFoddFact ont déjà été téléchargé.')
 
-    def interface(self):
+    def generate_category(self):
         """
-        This method allows us to create an interface between our tables SQL and the user.
-        During this loop,
-        the user will be able to find his substitued product or save subsitute products.
-        To save substitute product,
-        the user will have to select an category and a product to find a substitute product.
+        This method allows us to pick category data,
+        and insert into mysql database.
+        We pre-determinate 10 categories from OpenFoodFact.
         """
 
-        self.display_proposals.select_proposal(PROPOSALS)
-        result1 = self.display_proposals.result
+        for cat_name in CATEGORY:
 
-        while result1 not in ('1', '2', 'h', 'q'):
-            result_bis = input(WRONG_ID)
-            result1 = result_bis
-            break
+            try:
+                self.category.c_name = cat_name
 
-        else:
-            if result1 == '1':
-                self.display_category.display_category()
-                result2 = self.display_category.result
+                self.category.add_data(REQUEST_ADD_CATEGORY, **self.category.__dict__)
 
-                while result2 not in self.display_category.list_proposals_categories and result2 != 'h':
-                    result_bis = input(WRONG_ID)
-                    result2 = result_bis
-                    break
+            except KeyError:
+                pass
 
-                else:
-                    if result2 in self.display_category.list_proposals_categories:
-                        self.display_product.display_product(result2)
-                        result3 = self.display_product.result
+    def generate_store(self):
+        """
+        This method allows us to extract stores from OpenFoodFact API,
+        and insert stores data into table 'Store' from mysql database.
+        """
 
-                        while result3 not in self.display_product.list_proposals_products and result3 != 'h':
-                            result_bis = input(WRONG_ID)
-                            result3 = result_bis
-                            break
+        liste_stores_brut = []
+        liste_stores = []
 
-                        else:
-                            if result2 in self.display_category.list_proposals_categories and result3 != 'h':
-                                self.display_substitute_product.display_substitute_product(result2)
-                                result4 = self.display_substitute_product.result
+        for cat_name in CATEGORY:
 
-                                while result4 not in self.display_substitute_product.list_proposals_substitute_products and result4 != 'h':
-                                    result_bis = input(WRONG_ID)
-                                    result4 = result_bis
-                                    break
+            params_url = {'action':'process',
+                          'tagtype_0':'categories',
+                          'tag_contains_0':'contains',
+                          'tag_0':cat_name,
+                          'sort_by':'unique_scans_n',
+                          'page_size':self.page_size,
+                          'axis_x':'energy',
+                          'axis_y':'products_n',
+                          'json':'1'}
+            response = requests.get(URL_BEGIN, params=params_url)
+            response_json = response.json()
 
-                                else:
-                                    if result4 in self.display_substitute_product.list_proposals_substitute_products:
-                                        self.save_substitute_product.save_subsitute_product(result4)
-                                        self.add_substitut_id.add_substitut_id(result4)
-                                        self.end_process_proposal1.end_process()
+            for product in response_json["products"]:
 
-                                        result5 = self.end_process_proposal1.result
+                try:
+                    self.store.s_name = product["stores"]
 
-                                        while result5 not in ('q', 'h'):
-                                            result_bis = input(WRONG_INPUT)
-                                            result5 = result_bis
-                                            break
+                    stores_product = self.store.s_name.split(",")
+                    liste_stores_brut.extend(stores_product)
+                    liste_stores = list(set(liste_stores_brut))
+                except KeyError:
+                    pass
 
-                                        else:
-                                            if result5 == 'q':
-                                                self.disconnect_mysql.cursor.close()
-                                                print(END_PROCESS)
-                                                sys.exit()
+        for store in liste_stores:
+            self.store.s_name = store
+            self.store.add_data(REQUEST_ADD_STORE, **self.store.__dict__)
 
-                                            elif result5 == 'h':
-                                                back_home = Program()
-                                                back_home.interface()
+    def generate_product(self):
+        """
+        This method allows us to extract products from OpenFoodFact API,
+        and insert products data into table 'Product' from mysql database.
+        """
 
-                                    elif result4 == 'h':
-                                        back_home = Program()
-                                        back_home.interface()
+        for cat_name, cat_id in CATEGORY.items():
 
-                            elif result3 == 'h':
-                                back_home = Program()
-                                back_home.interface()
+            params_url = {'action':'process',
+                          'tagtype_0':'categories',
+                          'tag_contains_0':'contains',
+                          'tag_0':cat_name,
+                          'sort_by':'unique_scans_n',
+                          'page_size':self.page_size,
+                          'axis_x':'energy',
+                          'axis_y':'products_n',
+                          'json':'1'}
+            response = requests.get(URL_BEGIN, params=params_url)
+            response_json = response.json()
 
-                    elif result2 == 'h':
-                        back_home = Program()
-                        back_home.interface()
+            for product in response_json["products"]:
 
-            elif result1 == '2':
-                self.display_substitued_product.display_substitued_product()
-                result2 = self.display_substitued_product.result
+                try:
+                    self.product.p_name = product["product_name_fr"]
+                    self.product.p_nutri = product["nutriscore_grade"]
+                    self.product.p_url = product["url"]
+                    self.product.p_cat_name = cat_name
+                    self.product.p_cat_id = cat_id
 
-                while result2 not in self.display_substitued_product.list_proposals_substitued_products and result2 != 'h':
-                    result_bis = input(WRONG_ID)
-                    result2 = result_bis
-                    break
+                    for n_id, n_text in CONV.items():
+                        if self.product.p_nutri == n_text:
+                            self.product.p_nutri_value = n_id
 
-                else:
-                    if result2 in self.display_substitued_product.list_proposals_substitued_products:
-                        self.delete_substitued_product.delete_substitued_product(result2)
-                        self.end_process_proposal2.end_process()
+                    self.product.add_data(REQUEST_ADD_PRODUCT, **self.product.__dict__)
 
-                        result3 = self.end_process_proposal2.result
+                    list_stores_per_product = product['stores'].split(",")
+                    self.store.condition_load_data(REQUEST_SEARCH_STORE)
+                    for row in self.store.condition_load_data(REQUEST_SEARCH_STORE):
+                        for store in list_stores_per_product:
+                            if row[1] == store:
+                                self.association.p_id = \
+                                    self.product.product_id(REQUEST_SEARCH_PRODUCT_STORES)
+                                self.association.s_id = row[0]
+                                self.association.add_data(REQUEST_ADD_ASSOCIATION,
+                                                          **self.association.__dict__)
 
-                        while result3 not in ('q', 'h'):
-                            result_bis = input(WRONG_INPUT)
-                            result3 = result_bis
-                            break
+                except KeyError:
+                    pass
 
-                        else:
-                            if result3 == 'q':
-                                self.disconnect_mysql.cursor.close()
-                                print(END_PROCESS)
-                                sys.exit()
+    def main(self):
+        """
+        This method allows us to start the program.
+        At the beginning, the user have to select one of these proposals.
+        """
 
-                            elif result3 == 'h':
-                                back_home = Program()
-                                back_home.interface()
+        self.display_proposals.display(STEP1, STEP1_BIS)
+        proposal = self.get_input(['1', '2'])
 
-                    elif result2 == 'h':
-                        back_home = Program()
-                        back_home.interface()
+        if proposal == '1':
+            self.process_find_substitute_product()
 
-            elif result1 == 'q':
-                self.disconnect_mysql.cursor.close()
+        elif proposal == '2':
+            self.process_display_saved_product()
+
+    def get_input(self, list_valid_input):
+        """
+        This method allows us to manage user input from user interface.
+        At each steps:
+        - The user can leave the programm.
+        - The user can return back in the main menu.
+        """
+
+        ret = input('Entrée >>> ')
+
+        while ret not in list_valid_input:
+
+            if ret == 'h':
+                back_home = Program()
+                back_home.main()
+
+            elif ret == 'q':
+                self.mysql.cursor.close()
                 print(END_PROCESS)
                 sys.exit()
 
+            else:
+                ret = input(WRONG_ID)
 
-PROGRAM = Program()
-PROGRAM.generate_data_category()
-PROGRAM.generate_data_store()
-PROGRAM.generate_data_product()
-PROGRAM.interface()
+        return ret
+
+    def process_find_substitute_product(self):
+        """
+        This method allows us to start the first functionality of the program.
+        At the end of the process:
+        - The user find substitue product.
+        - The user can save a substitute product.
+        """
+
+        ################################################ Display Category
+        data_c = self.mysql.request_searchall_data(REQUEST_SEARCH_CATEGORY)
+
+        self.display_c.display(STEP2, STEP2_BIS, request=data_c)
+
+        ################################################ Display Product
+        step3_attributes = (int(self.get_input(self.display_c.list_valid_input)),)
+
+        data_p = self.mysql.request_searchmany_data(REQUEST_SEARCH_PRODUCT,
+                                                    step3_attributes, many=15)
+
+        self.display_p.display(STEP3, STEP3_BIS, request=data_p)
+
+        ################################################ Display Substitute Product
+        self.get_input(self.display_p.list_valid_input)
+
+        data_sub_p = self.mysql.request_searchmany_data(REQUEST_SEARCH_SUBSTITUTE_PRODUCT,
+                                                        step3_attributes, many=5)
+
+        self.display_sub_p.display(STEP4, STEP4_BIS, request=data_sub_p)
+
+        ################################################ Save Substitute Product
+        attribute = int(self.get_input(self.display_sub_p.list_valid_input))
+        step5_attributes = (attribute, attribute)
+
+        self.mysql.request_update_data(REQUEST_UPDATE_SUBSTITUT_ID,
+                                       step5_attributes)
+
+        self.display_save_p.display(STEP5, STEP5_BIS, display_result='No')
+
+        ################################################ End process1
+        self.get_input(self.display_save_p.list_valid_input)
+
+    def process_display_saved_product(self):
+        """
+        This method allows us to start the second functionality of the program.
+        At the end of the process:
+        - The user refind saved products.
+        - The user can delete a saved product.
+        """
+
+        ################################################ Display Substitued Product
+        data_saved_p = self.mysql.request_searchall_data(REQUEST_SEARCH_SUBSTITUED_PRODUCT)
+
+        self.display_saved_p.display(STEP6, STEP6_BIS, request=data_saved_p)
+
+        ################################################ Delete Substituted Product
+        step7_attributes = (int(self.get_input(self.display_saved_p.list_valid_input)),)
+
+        self.mysql.request_update_data(REQUEST_DELETE_SUBSTITUT_ID,
+                                       step7_attributes)
+
+        self.display_delete_p.display(STEP7, STEP7_BIS, display_result='No')
+
+        ################################################ End process2
+        self.get_input(self.display_delete_p.list_valid_input)
+
+
+if __name__ == "__main__":
+
+    program = Program()
+    program.generate_data()
+    program.main()
