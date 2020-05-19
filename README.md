@@ -90,13 +90,13 @@ Au commencement le programme propose deux fonctionnalités:
 1. Rechercher un produit de substitution.
 2. Retrouver ses produits substitués
 
-Fonctionnalité 1:
+>>>Fonctionnalité 1:
 Affichage des catégories
 - Sélection d'une catégorie >>> Affichage d'un panel de produits.
 - Sélection d'un produit >>> Affichage d'un panel de produits de substitution.
 - Sélection d'un produit de subsitution >>> Sauvegarde du produit sélectionné.
 
-Fonctionnalité 2:
+>>>Fonctionnalité 2:
 Affichage des produits sauvegardés.
 - Sélection d'un produit >>> Suppression du produit sélectionné.
 
